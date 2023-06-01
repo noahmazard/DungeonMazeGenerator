@@ -15,7 +15,7 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	if (!WallMeshClass) return;
 
 	//Generate maze
-	//Generator.SetSeed(Seed);
+	Generator.SetSeed(Seed);
 	Generator.SetSize(LabSize.X, LabSize.Y);
 	Generator.Generate();
 
@@ -37,11 +37,11 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	}
 
 	//Create outer walls
-	for (int x = 0; x < LabSize.X; x++)
+	for (int x = 0; x < static_cast<int>(LabSize.X); x++)
 	{
 		CreateWall(x, 0, West);
 	}
-	for (int y = 0; y < LabSize.Y; y++)
+	for (int y = 0; y < static_cast<int>(LabSize.Y); y++)
 	{
 		CreateWall(0, y, South);
 	}

@@ -4,7 +4,7 @@
 void MazeGenerator::Generate()
 {
 	//Set random seed
-	FMath::SRandInit(Seed);
+	FRandomStream random(Seed);
 
 	//Init cells
 	if (cells)
@@ -54,7 +54,7 @@ void MazeGenerator::Generate()
 		if (!unvisitedNeighbours.empty())
 		{
 			//Choose random neighbour
-			EDirection direction = unvisitedNeighbours[FMath::RandRange(0, unvisitedNeighbours.size() - 1)];
+			EDirection direction = unvisitedNeighbours[random.RandRange(0, unvisitedNeighbours.size() - 1)];
 
 			//Remove current cell's wall
 			cells[y * Width + x].Walls &= ~direction;
@@ -104,7 +104,7 @@ void MazeGenerator::SetSize(int _w, int _h)
 	Height = _h;
 }
 
-inline void MazeGenerator::SetSeed(int _seed)
+void MazeGenerator::SetSeed(int _seed)
 {
 	Seed = _seed;
 }
