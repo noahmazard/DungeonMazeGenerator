@@ -4,16 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "MazeGenerator.h"
 #include "Labyrinth.generated.h"
-
-UENUM()
-enum EDirection
-{
-	North,
-	South,
-	East,
-	West
-};
 
 UCLASS()
 class LABYRINTHGAME_API ALabyrinth : public AActor
@@ -44,9 +36,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Generation)
 	FVector2D TileSize = FVector2D(200, 200);
 	
-
-	
-	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -56,6 +45,8 @@ private:
 	TArray<UStaticMeshComponent*> Meshes;
 
 	void CreateWall(int x, int y, EDirection Direction);
+
+	MazeGenerator Generator;
 	
 public:	
 	// Called every frame
