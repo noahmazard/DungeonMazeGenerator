@@ -14,13 +14,14 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	if (!WallMeshClass) return;
 
-	if (Seed != lastSeed)
+	if (Seed != lastSeed || LabSize != lastSize)
 	{
 		//Regenerate maze
 		Generator.SetSeed(Seed);
 		Generator.SetSize(LabSize.X, LabSize.Y);
 		Generator.Generate();
 		lastSeed = Seed;
+		lastSize = LabSize;
 	}
 	
 	//Generate walls from maze cells
@@ -49,6 +50,9 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	{
 		CreateWall(0, y, South);
 	}
+
+	//Create floor
+	CreateFloor(LabSize.X, LabSize.Y);
 }
 
 // Called when the game starts or when spawned
@@ -60,7 +64,8 @@ void ALabyrinth::BeginPlay()
 void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
 {
 	if (!WallMeshClass) return;
-	
+
+	//Compute offset from tile center and rotation for the walls
 	FVector2D Offset = FVector2D(0, 0);
 	FRotator Rotation = FRotator(0, 0, 0);
 	switch (Direction)
@@ -84,11 +89,26 @@ void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
 	default: ;
 	}
 
+	//Create wall mesh component
 	UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
 	Mesh->SetStaticMesh(WallMeshClass);
 	Mesh->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),
 	                               TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
 	Mesh->SetWorldRotation(Rotation);
+	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Mesh->RegisterComponent();
+	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	Meshes.Add(Mesh);
+}
+
+void ALabyrinth::CreateFloor(int x, int y)
+{
+	if (!FloorMeshClass) return;
+	
+	UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
+	Mesh->SetStaticMesh(FloorMeshClass);
+	Mesh->SetWorldLocation(FVector(- 0.5 * TileSize.X , - 0.5 * TileSize.Y, 0));
+	Mesh->SetWorldScale3D(FVector(x,y,1));
 	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	Mesh->RegisterComponent();
 	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;

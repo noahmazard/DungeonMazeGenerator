@@ -26,6 +26,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	bool bMoveHalfTile = false;
+
+	UPROPERTY(EditAnywhere, Category = Mesh)
+	UStaticMesh* FloorMeshClass;
 	
 	UPROPERTY(EditAnywhere, Category = Generation)
 	int Seed = 0;
@@ -33,7 +36,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Generation)
 	FVector2D LabSize = FVector2D(10, 10);
 
-	UPROPERTY(EditAnywhere, Category = Generation)
+	UPROPERTY(EditAnywhere, Category = Mesh)
 	FVector2D TileSize = FVector2D(200, 200);
 	
 	// Called when the game starts or when spawned
@@ -45,11 +48,12 @@ private:
 	TArray<UStaticMeshComponent*> Meshes;
 
 	void CreateWall(int x, int y, EDirection Direction);
+	void CreateFloor(int x, int y);
 
 	MazeGenerator Generator;
 
 	int lastSeed = -1;
-	
+	FVector2D lastSize = FVector2D(-1, -1);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
