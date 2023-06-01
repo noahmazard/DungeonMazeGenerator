@@ -47,6 +47,8 @@ private:
 	void CreateWall(int x, int y, EDirection Direction);
 
 	MazeGenerator Generator;
+
+	int lastSeed = -1;
 	
 public:	
 	// Called every frame

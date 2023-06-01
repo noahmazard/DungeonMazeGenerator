@@ -14,11 +14,15 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	if (!WallMeshClass) return;
 
-	//Generate maze
-	Generator.SetSeed(Seed);
-	Generator.SetSize(LabSize.X, LabSize.Y);
-	Generator.Generate();
-
+	if (Seed != lastSeed)
+	{
+		//Regenerate maze
+		Generator.SetSeed(Seed);
+		Generator.SetSize(LabSize.X, LabSize.Y);
+		Generator.Generate();
+		lastSeed = Seed;
+	}
+	
 	//Generate walls from maze cells
 	for (int x = 0; x < LabSize.X; x++)
 	{
