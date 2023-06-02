@@ -48,22 +48,22 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	{
 		if (ExitDirection & North)
 		{
-			CreateExit(ExitCell->x, ExitCell->y, North);
+			CreateExit(ExitCell->x, ExitCell->y, North, ExitActorClass);
 			ExitDirection = North;
 		}
 		else if (ExitDirection & South)
 		{
-			CreateExit(ExitCell->x, ExitCell->y, South);
+			CreateExit(ExitCell->x, ExitCell->y, South,ExitActorClass);
 			ExitDirection = South;
 		}
 		else if (ExitDirection & East)
 		{
-			CreateExit(ExitCell->x, ExitCell->y, East);
+			CreateExit(ExitCell->x, ExitCell->y, East, ExitActorClass);
 			ExitDirection = East;
 		}
 		else if (ExitDirection & West)
 		{
-			CreateExit(ExitCell->x, ExitCell->y, West);
+			CreateExit(ExitCell->x, ExitCell->y, West, ExitActorClass);
 			ExitDirection = West;
 		}
 	}
@@ -75,22 +75,22 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 	{
 		if (EntranceDirection & North)
 		{
-			CreateExit(EntranceCell->x, EntranceCell->y, North);
+			CreateExit(EntranceCell->x, EntranceCell->y, North, EntranceActorClass);
 			EntranceDirection = North;
 		}
 		else if (EntranceDirection & East)
 		{
-			CreateExit(EntranceCell->x, EntranceCell->y, East);
+			CreateExit(EntranceCell->x, EntranceCell->y, East, EntranceActorClass);
 			EntranceDirection = East;
 		}
 		else if (EntranceDirection & South)
 		{
-			CreateExit(EntranceCell->x, EntranceCell->y, South);
+			CreateExit(EntranceCell->x, EntranceCell->y, South, EntranceActorClass);
 			EntranceDirection = South;
 		}
 		else if (EntranceDirection & West)
 		{
-			CreateExit(EntranceCell->x, EntranceCell->y, West);
+			CreateExit(EntranceCell->x, EntranceCell->y, West, EntranceActorClass);
 			EntranceDirection = West;
 		}
 	}
@@ -183,9 +183,9 @@ void ALabyrinth::CreateFloor(int x, int y)
 	Meshes.Add(Mesh);
 }
 
-void ALabyrinth::CreateExit(int x, int y, EDirection Direction)
+void ALabyrinth::CreateExit(int x, int y, EDirection Direction, TSubclassOf<AActor> actorClass)
 {
-	if (!ExitActorClass) return;
+	if (!actorClass) return;
 
 	//Compute offset from tile center and rotation for the walls
 	FVector2D Offset;
@@ -194,7 +194,7 @@ void ALabyrinth::CreateExit(int x, int y, EDirection Direction)
 
 	//Create wall mesh component
 	UChildActorComponent* Exit = NewObject<UChildActorComponent>(this);
-	Exit->SetChildActorClass(ExitActorClass);
+	Exit->SetChildActorClass(actorClass);
 	Exit->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
 	Exit->SetWorldRotation(Rotation);
 	Exit->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);

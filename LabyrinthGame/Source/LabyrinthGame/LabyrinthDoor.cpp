@@ -23,7 +23,7 @@ void ALabyrinthDoor::Interact_Implementation()
 	{
 		if (gameMode->nbKeys >= nbKeysRequired)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("You have open the door")));
+			OpenDoor();
 		}
 		else
 		{

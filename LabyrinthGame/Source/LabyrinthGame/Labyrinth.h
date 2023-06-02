@@ -46,6 +46,9 @@ protected:
 	TSubclassOf<AActor> ExitActorClass;
 
 	UPROPERTY(EditAnywhere, Category = Mesh)
+	TSubclassOf<AActor> EntranceActorClass;
+	
+	UPROPERTY(EditAnywhere, Category = Mesh)
 	TSubclassOf<AActor> ChestActorClass;
 	
 	// Called when the game starts or when spawned
@@ -58,7 +61,7 @@ private:
 
 	void CreateWall(int x, int y, EDirection Direction);
 	void CreateFloor(int x, int y);
-	void CreateExit(int x, int y, EDirection Direction);
+	void CreateExit(int x, int y, EDirection Direction, TSubclassOf<AActor> actorClass);
 	void CreateChest(int x, int y, EDirection Direction);
 
 	void ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
