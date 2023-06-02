@@ -38,6 +38,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	FVector2D TileSize = FVector2D(200, 200);
+
+	UPROPERTY(EditAnywhere, Category = Generation)
+	int nbChests = 1;
+
+	UPROPERTY(EditAnywhere, Category = Mesh)
+	TSubclassOf<AActor> ExitActorClass;
+
+	UPROPERTY(EditAnywhere, Category = Mesh)
+	TSubclassOf<AActor> ChestActorClass;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,7 +58,11 @@ private:
 
 	void CreateWall(int x, int y, EDirection Direction);
 	void CreateFloor(int x, int y);
+	void CreateExit(int x, int y, EDirection Direction);
+	void CreateChest(int x, int y, EDirection Direction);
 
+	void ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
+	
 	MazeGenerator Generator;
 
 	int lastSeed = -1;

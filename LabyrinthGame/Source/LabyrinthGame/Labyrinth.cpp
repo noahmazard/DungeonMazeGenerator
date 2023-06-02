@@ -33,22 +33,85 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 			if (!Cell) continue;
 
 			//Only create walls in north and east direction
-			if (Cell->HasWall(North))
+			if (Cell->HasWall(North) && x != LabSize.X - 1)
 				CreateWall(x, y, North);
 			
-			if (Cell->HasWall(East))
+			if (Cell->HasWall(East) && y != LabSize.Y - 1)
 				CreateWall(x, y, East);
 		}
 	}
 
+	//Create exit
+	int ExitDirection = 0;
+	const MazeCell* ExitCell = Generator.GetExitCell(ExitDirection);
+	if (ExitCell)
+	{
+		if (ExitDirection & North)
+		{
+			CreateExit(ExitCell->x, ExitCell->y, North);
+			ExitDirection = North;
+		}
+		else if (ExitDirection & South)
+		{
+			CreateExit(ExitCell->x, ExitCell->y, South);
+			ExitDirection = South;
+		}
+		else if (ExitDirection & East)
+		{
+			CreateExit(ExitCell->x, ExitCell->y, East);
+			ExitDirection = East;
+		}
+		else if (ExitDirection & West)
+		{
+			CreateExit(ExitCell->x, ExitCell->y, West);
+			ExitDirection = West;
+		}
+	}
+
+	//Create entrance
+	int EntranceDirection = 0;
+	const MazeCell* EntranceCell = Generator.GetEntranceCell(EntranceDirection);
+	if (EntranceCell)
+	{
+		if (EntranceDirection & North)
+		{
+			CreateExit(EntranceCell->x, EntranceCell->y, North);
+			EntranceDirection = North;
+		}
+		else if (EntranceDirection & East)
+		{
+			CreateExit(EntranceCell->x, EntranceCell->y, East);
+			EntranceDirection = East;
+		}
+		else if (EntranceDirection & South)
+		{
+			CreateExit(EntranceCell->x, EntranceCell->y, South);
+			EntranceDirection = South;
+		}
+		else if (EntranceDirection & West)
+		{
+			CreateExit(EntranceCell->x, EntranceCell->y, West);
+			EntranceDirection = West;
+		}
+	}
+
+	
 	//Create outer walls
 	for (int x = 0; x < static_cast<int>(LabSize.X); x++)
 	{
-		CreateWall(x, 0, West);
+		//if not entrance and entrance direction or exit and exit direction
+		if (!((x == EntranceCell->x && EntranceDirection & West) || (x == ExitCell->x && ExitDirection & West)))
+			CreateWall(x, 0, West);
+
+		if (!((x == EntranceCell->x && EntranceDirection & East) || (x == ExitCell->x && ExitDirection & East)))
+			CreateWall(x, LabSize.Y-1, East);
 	}
 	for (int y = 0; y < static_cast<int>(LabSize.Y); y++)
 	{
-		CreateWall(0, y, South);
+		if (!((y == EntranceCell->y && EntranceDirection & South) || (y == ExitCell->y && ExitDirection & South)))
+			CreateWall(0, y, South);
+		if (!((y == EntranceCell->y && EntranceDirection & North) || (y == ExitCell->y && ExitDirection & North)))
+			CreateWall(LabSize.X-1, y, North);
 	}
 
 	//Create floor
@@ -61,13 +124,8 @@ void ALabyrinth::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
+void ALabyrinth::ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation)
 {
-	if (!WallMeshClass) return;
-
-	//Compute offset from tile center and rotation for the walls
-	FVector2D Offset = FVector2D(0, 0);
-	FRotator Rotation = FRotator(0, 0, 0);
 	switch (Direction)
 	{
 	case East:
@@ -88,6 +146,16 @@ void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
 		break;
 	default: ;
 	}
+}
+
+void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
+{
+	if (!WallMeshClass) return;
+
+	//Compute offset from tile center and rotation for the walls
+	FVector2D Offset;
+	FRotator Rotation;
+	ComputeWallOffset(Direction, Offset, Rotation);
 
 	//Create wall mesh component
 	UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
@@ -114,6 +182,31 @@ void ALabyrinth::CreateFloor(int x, int y)
 	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 	Meshes.Add(Mesh);
 }
+
+void ALabyrinth::CreateExit(int x, int y, EDirection Direction)
+{
+	if (!ExitActorClass) return;
+
+	//Compute offset from tile center and rotation for the walls
+	FVector2D Offset;
+	FRotator Rotation;
+	ComputeWallOffset(Direction, Offset, Rotation);
+
+	//Create wall mesh component
+	UChildActorComponent* Exit = NewObject<UChildActorComponent>(this);
+	Exit->SetChildActorClass(ExitActorClass);
+	Exit->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
+	Exit->SetWorldRotation(Rotation);
+	Exit->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Exit->RegisterComponent();
+	Exit->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+}
+
+void ALabyrinth::CreateChest(int x, int y, EDirection Direction)
+{
+	
+}
+
 
 // Called every frame
 void ALabyrinth::Tick(float DeltaTime)

@@ -4,8 +4,8 @@
 void MazeGenerator::Generate()
 {
 	//Set random seed
-	FRandomStream random(Seed);
-
+	random.Initialize(Seed);
+	
 	//Init cells
 	if (cells)
 	{
@@ -29,7 +29,11 @@ void MazeGenerator::Generate()
 		int x = pos.first;
 		int y = pos.second;
 
-		cells[y * Width + x].Visited = true;
+		const int ID = y * Width + x;
+		cells[ID].Visited = true;
+		cells[ID].id = ID;
+		cells[ID].x = x;
+		cells[ID].y = y;
 
 		//Get unvisited neighbours
 		std::vector<EDirection> unvisitedNeighbours;
@@ -57,7 +61,7 @@ void MazeGenerator::Generate()
 			EDirection direction = unvisitedNeighbours[random.RandRange(0, unvisitedNeighbours.size() - 1)];
 
 			//Remove current cell's wall
-			cells[y * Width + x].Walls &= ~direction;
+			cells[ID].Walls &= ~direction;
 
 			//Push selected neighbour to stack and remove his wall
 			switch (direction)
@@ -86,6 +90,18 @@ void MazeGenerator::Generate()
 			stack.pop();
 		}
 	}
+
+	//Set entrance and exit
+	MazeCell* c = GetRandomOuterCell(0);
+	if (!c) return;
+	entrance = c->id;
+	
+	do {
+		c = GetRandomOuterCell(Width * Height - 1);
+		if (!c) return;
+		exit = c->id;
+	} while (exit == entrance);
+
 }
 
 MazeCell* MazeGenerator::GetCell(int _x, int _y)
@@ -96,6 +112,45 @@ MazeCell* MazeGenerator::GetCell(int _x, int _y)
 		return nullptr;
 	}
 	return &cells[_y * Width + _x];
+}
+
+MazeCell* MazeGenerator::GetEntranceCell(int& _direction)
+{
+	_direction = GetDirection(entrance);
+	return &cells[entrance];
+}
+
+MazeCell* MazeGenerator::GetExitCell(int& _direction)
+{
+	_direction = GetDirection(exit);
+	return &cells[exit];
+}
+
+MazeCell* MazeGenerator::GetRandomOuterCell(int defaultId = 0)
+{
+	switch (1 << random.RandRange(0, 3))
+	{
+	case North:
+		return &cells[Height * (Width - 1) + random.RandRange(0, Height - 1)];
+	case South:
+		return &cells[random.RandRange(0, Height - 1)];
+	case East:
+		return &cells[random.RandRange(0, Width - 1) * Height + Height - 1];
+	case West:
+		return &cells[random.RandRange(0, Width - 1) * Height];
+	default:
+		return &cells[defaultId];
+	}
+}
+
+int MazeGenerator::GetDirection(int cellId) const
+{
+	int direction = 0;
+	direction |= cells[cellId].x == 0 ? South : 0;
+	direction |= cells[cellId].x == Width - 1 ? North : 0;
+	direction |= cells[cellId].y == 0 ? West : 0;
+	direction |= cells[cellId].y == Height - 1 ? East : 0;
+	return direction;
 }
 
 void MazeGenerator::SetSize(int _w, int _h)

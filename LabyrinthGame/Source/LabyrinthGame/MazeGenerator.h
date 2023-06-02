@@ -17,8 +17,10 @@ public:
 	void SetSeed(int _seed);
 	
 	void Generate();
-
+	
 	MazeCell* GetCell(int _x, int _y);
+	MazeCell* GetEntranceCell(int& _direction);
+	MazeCell* GetExitCell(int& _direction);
 	
 protected:
 	int Width = 0;
@@ -26,6 +28,12 @@ protected:
 	int Seed = 0;
 
 	MazeCell* cells = nullptr;
+	MazeCell* GetRandomOuterCell(int defaultId);
+
+	int GetDirection(int cellId) const;
+
+	int entrance = 0;
+	int exit = 0;
+
+	FRandomStream random;
 };
-
-
