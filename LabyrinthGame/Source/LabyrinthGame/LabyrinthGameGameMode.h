@@ -13,6 +13,8 @@ class ALabyrinthGameGameMode : public AGameModeBase
 
 public:
 	ALabyrinthGameGameMode();
+
+	int nbKeys = 0;
 };
 
 
