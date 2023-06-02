@@ -3,6 +3,8 @@
 
 #include "Chest.h"
 
+#include "LabyrinthGameGameMode.h"
+
 
 // Sets default values
 AChest::AChest()
@@ -14,7 +16,18 @@ AChest::AChest()
 void AChest::Interact_Implementation()
 {
 	IInteractable::Interact_Implementation();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Chest interacted in code"));
+	if (!isOpen)
+	{
+		isOpen = true;
+		
+		//Add a key to the player
+		ALabyrinthGameGameMode* gameMode = Cast<ALabyrinthGameGameMode>(GetWorld()->GetAuthGameMode());
+		if (gameMode)
+		{
+			gameMode->nbKeys++;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("You have %d keys"), gameMode->nbKeys));
+		}
+	}
 }
 
 // Called when the game starts or when spawned
