@@ -25,7 +25,7 @@ void AChest::Interact_Implementation()
 		if (gameMode)
 		{
 			gameMode->nbKeys++;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("You have %d keys"), gameMode->nbKeys));
+			OpenChest();
 		}
 	}
 }
