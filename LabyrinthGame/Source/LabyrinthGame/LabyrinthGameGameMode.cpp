@@ -3,7 +3,6 @@
 #include "LabyrinthGameGameMode.h"
 
 #include "Labyrinth.h"
-#include "LabyrinthGameCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -22,15 +21,18 @@ void ALabyrinthGameGameMode::RestartPlayer(AController* NewPlayer)
 	{
 		return;
 	}
-
-	//Get Actor of class Labyrint
-	TArray<AActor*> FoundActors;
-	ALabyrinth* Labyrinth=  Cast<ALabyrinth>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabyrinth::StaticClass()));
 	
-	FTransform SpawnTransform;
-
-	if (Labyrinth)
-		SpawnTransform.SetLocation(Labyrinth->EntranceLocation + FVector(0, 0, 100));
-
+	FTransform SpawnTransform = FTransform::Identity;
+	
+	if (const ALabyrinth* Labyrinth = Cast<ALabyrinth>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabyrinth::StaticClass())))
+	{
+		if (const UChildActorComponent* Entrance = Labyrinth->EntranceComponent)
+		{
+			const FTransform T = Entrance->GetComponentTransform();
+			
+			SpawnTransform = FTransform(T.GetRotation(), T.GetLocation() + T.GetRotation().RotateVector(FVector(250, 250, 100)), FVector(1, 1, 1));
+		}
+	}
+	
 	RestartPlayerAtTransform(NewPlayer, SpawnTransform);
 }

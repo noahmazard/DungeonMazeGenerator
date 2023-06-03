@@ -16,7 +16,7 @@ public:
 	ALabyrinth();
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector EntranceLocation;
+	UChildActorComponent* EntranceComponent;
 
 protected:
 
@@ -64,13 +64,13 @@ private:
 	UPROPERTY()
 	TArray<USceneComponent*> Components;
 
-	void CreateWall(int x, int y, EDirection Direction);
-	void CreateFloor(int x, int y);
-	void CreateExit(int x, int y, EDirection Direction, TSubclassOf<AActor> actorClass);
-	void CreateChest(int x, int y, EDirection Direction);
+	UStaticMeshComponent* CreateWall(int x, int y, EDirection Direction);
+	UStaticMeshComponent* CreateFloor(int x, int y);
+	UChildActorComponent* CreateExit(int x, int y, int Direction, TSubclassOf<AActor> actorClass);
+	UChildActorComponent* CreateChest(int x, int y, EDirection Direction);
 
-	void ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
-	void ComputeChestOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
+	void ComputeWallOffset(int Direction, FVector2D& Offset, FRotator& Rotation) const;
+	void ComputeChestOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation) const;
 
 	MazeGenerator Generator;
 
