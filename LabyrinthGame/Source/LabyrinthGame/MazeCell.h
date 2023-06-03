@@ -10,4 +10,5 @@ public:
 	int Walls = 0b1111;
 	bool Visited = false;
 	bool HasWall(int Direction) const;
+	int GetNbWalls() const;
 };

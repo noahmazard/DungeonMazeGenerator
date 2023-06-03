@@ -13,6 +13,12 @@ void MazeGenerator::Generate()
 	}
 	cells = new MazeCell[Width * Height];
 
+	//Init ChestCellsId
+	if (ChestCellsId.Num() > 0)
+	{
+		ChestCellsId.Empty();
+	}
+
 	//Init stack
 	std::stack<std::pair<int, int>> stack;
 
@@ -88,8 +94,17 @@ void MazeGenerator::Generate()
 		{
 			//Backtrack
 			stack.pop();
+			
+			//Add to chest cells
+			if (cells[ID].GetNbWalls() == 3)
+			{
+				ChestCellsId.Add(ID);
+			}
 		}
 	}
+
+	//Shuffle chest cells
+	Shuffle(&ChestCellsId);
 
 	//Set entrance and exit
 	MazeCell* c = GetRandomOuterCell(0);
@@ -104,7 +119,7 @@ void MazeGenerator::Generate()
 
 }
 
-MazeCell* MazeGenerator::GetCell(int _x, int _y)
+const MazeCell* MazeGenerator::GetCell(int _x, int _y) const
 {
 	if (!cells) return nullptr;
 	if (_x < 0 || _x >= Width || _y < 0 || _y >= Height)
@@ -114,19 +129,27 @@ MazeCell* MazeGenerator::GetCell(int _x, int _y)
 	return &cells[_y * Width + _x];
 }
 
-MazeCell* MazeGenerator::GetEntranceCell(int& _direction)
+const MazeCell* MazeGenerator::GetEntranceCell(int& _direction) const
 {
 	_direction = GetDirection(entrance);
 	return &cells[entrance];
 }
 
-MazeCell* MazeGenerator::GetExitCell(int& _direction)
+const MazeCell* MazeGenerator::GetExitCell(int& _direction) const
 {
 	_direction = GetDirection(exit);
 	return &cells[exit];
 }
 
-MazeCell* MazeGenerator::GetRandomOuterCell(int defaultId = 0)
+const MazeCell* MazeGenerator::GetChestCell(int i, int& _direction) const
+{
+	if (i < 0 || i >= ChestCellsId.Num()) return nullptr;
+	const MazeCell* c = &cells[ChestCellsId[i]];
+	if (c) _direction = ~c->Walls & 0b1111;
+	return c;
+}
+
+MazeCell* MazeGenerator::GetRandomOuterCell(int defaultId = 0) const
 {
 	switch (1 << random.RandRange(0, 3))
 	{
@@ -151,6 +174,15 @@ int MazeGenerator::GetDirection(int cellId) const
 	direction |= cells[cellId].y == 0 ? West : 0;
 	direction |= cells[cellId].y == Height - 1 ? East : 0;
 	return direction;
+}
+
+void MazeGenerator::Shuffle(TArray<int>* _array) const
+{
+	for (int i = 0; i < _array->Num() ; i++)
+	{
+		const int j = random.RandRange(0, _array->Num() - 1);
+		_array->Swap(i, j);
+	}
 }
 
 void MazeGenerator::SetSize(int _w, int _h)

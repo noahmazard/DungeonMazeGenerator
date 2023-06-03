@@ -65,11 +65,14 @@ private:
 	void CreateChest(int x, int y, EDirection Direction);
 
 	void ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
-	
+	void ComputeChestOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation);
+
 	MazeGenerator Generator;
 
 	int lastSeed = -1;
 	FVector2D lastSize = FVector2D(-1, -1);
+
+	int nbGeneratedChests = 0;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
