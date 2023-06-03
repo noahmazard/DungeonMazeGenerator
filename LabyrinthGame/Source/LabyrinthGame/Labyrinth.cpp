@@ -4,27 +4,40 @@
 
 #include "LabyrinthDoor.h"
 
+#define CREATION_METHOD EComponentCreationMethod::Native
+
 // Sets default values
 ALabyrinth::ALabyrinth()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	//Create root component
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	Root->SetWorldLocation(FVector(0, 0, 0));
+	Root->SetupAttachment(RootComponent);
+	Root->RegisterComponent();
+	RootComponent = Root;
 }
 
-void ALabyrinth::OnConstruction(const FTransform& Transform)
+// Called when the game starts or when spawned
+void ALabyrinth::BeginPlay()
 {
-	Super::OnConstruction(Transform);
+	Super::BeginPlay();
+}
 
+void ALabyrinth::GenerateLabyrinth()
+{
+	ClearLabyrinth();
+	
 	nbGeneratedChests = 0;
-	if (Seed != lastSeed || LabSize != lastSize)
-	{
-		//Regenerate maze
-		Generator.SetSeed(Seed);
-		Generator.SetSize(LabSize.X, LabSize.Y);
-		Generator.Generate();
-		lastSeed = Seed;
-		lastSize = LabSize;
-	}
+	
+	//Regenerate maze
+	Generator.SetSeed(Seed);
+	Generator.SetSize(LabSize.X, LabSize.Y);
+	Generator.Generate();
+	lastSeed = Seed;
+	lastSize = LabSize;
 
 	//Create chests
 	for (int i = 0; i < nbChests; i++)
@@ -129,14 +142,17 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 		if (!((y == EntranceCell->y && EntranceDirection & North) || (y == ExitCell->y && ExitDirection & North)))
 			CreateWall(LabSize.X - 1, y, North);
 	}
-
-	
 }
 
-// Called when the game starts or when spawned
-void ALabyrinth::BeginPlay()
+void ALabyrinth::ClearLabyrinth()
 {
-	Super::BeginPlay();
+	//Destroy all actors
+	for (auto comp : Components)
+	{
+		if (comp)
+			comp->DestroyComponent();
+	}
+	Components.Empty();
 }
 
 void ALabyrinth::ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRotator& Rotation)
@@ -202,10 +218,10 @@ void ALabyrinth::CreateWall(int x, int y, EDirection Direction)
 	Mesh->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),
 	                               TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
 	Mesh->SetWorldRotation(Rotation);
-	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Mesh->SetupAttachment(RootComponent);
+	Mesh->CreationMethod = CREATION_METHOD;
 	Mesh->RegisterComponent();
-	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-	Meshes.Add(Mesh);
+	Components.Add(Mesh);
 }
 
 void ALabyrinth::CreateFloor(int x, int y)
@@ -216,9 +232,9 @@ void ALabyrinth::CreateFloor(int x, int y)
 	Mesh->SetStaticMesh(FloorMeshClass);
 	Mesh->SetWorldLocation(FVector((-0.5 + static_cast<double>(x)) * TileSize.X, (-0.5+static_cast<double>(y)) * TileSize.Y, 0));
 	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Mesh->CreationMethod = CREATION_METHOD;
 	Mesh->RegisterComponent();
-	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-	Meshes.Add(Mesh);
+	Components.Add(Mesh);
 }
 
 void ALabyrinth::CreateExit(int x, int y, EDirection Direction, TSubclassOf<AActor> actorClass)
@@ -236,15 +252,17 @@ void ALabyrinth::CreateExit(int x, int y, EDirection Direction, TSubclassOf<AAct
 	Exit->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),
 	                               TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
 	Exit->SetWorldRotation(Rotation);
-	Exit->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Exit->SetupAttachment(RootComponent);
+	Exit->CreationMethod = CREATION_METHOD;
 	Exit->RegisterComponent();
-	Exit->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 
 	ALabyrinthDoor* Door = Cast<ALabyrinthDoor>(Exit->GetChildActor());
 	if (Door)
 	{
 		Door->nbKeysRequired = nbGeneratedChests;
 	}
+
+	Components.Add(Exit);
 }
 
 void ALabyrinth::CreateChest(int x, int y, EDirection Direction)
@@ -257,14 +275,16 @@ void ALabyrinth::CreateChest(int x, int y, EDirection Direction)
 	ComputeChestOffset(Direction, Offset, Rotation);
 
 	//Create wall mesh component
-	UChildActorComponent* Exit = NewObject<UChildActorComponent>(this);
-	Exit->SetChildActorClass(ChestActorClass);
-	Exit->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),
+	UChildActorComponent* Chest = NewObject<UChildActorComponent>(this);
+	Chest->SetChildActorClass(ChestActorClass);
+	Chest->SetWorldLocation(FVector(TileSize.X * (Offset.X + static_cast<double>(x)),
 	                               TileSize.Y * (Offset.Y + static_cast<double>(y)), 0));
-	Exit->SetWorldRotation(Rotation);
-	Exit->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	Exit->RegisterComponent();
-	Exit->CreationMethod = EComponentCreationMethod::UserConstructionScript;
+	Chest->SetWorldRotation(Rotation);
+	Chest->SetupAttachment(RootComponent);
+	Chest->CreationMethod = CREATION_METHOD;
+	Chest->RegisterComponent();
+
+	Components.Add(Chest);
 }
 
 

@@ -13,11 +13,7 @@ class LABYRINTHGAME_API ALabyrinth : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ALabyrinth();
-
-	// Called when the game starts or when spawned
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 	UPROPERTY(BlueprintReadOnly)
 	FVector EntranceLocation;
@@ -56,11 +52,17 @@ protected:
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = Generation)
+	void GenerateLabyrinth();
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = Generation)
+	void ClearLabyrinth();
 
 	
 private:
 	UPROPERTY()
-	TArray<UStaticMeshComponent*> Meshes;
+	TArray<USceneComponent*> Components;
 
 	void CreateWall(int x, int y, EDirection Direction);
 	void CreateFloor(int x, int y);
