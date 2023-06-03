@@ -50,6 +50,9 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 
 			if (Cell->HasWall(East) && y != LabSize.Y - 1)
 				CreateWall(x, y, East);
+
+			//Create floor
+			CreateFloor(x, y);
 		}
 	}
 
@@ -127,8 +130,7 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 			CreateWall(LabSize.X - 1, y, North);
 	}
 
-	//Create floor
-	CreateFloor(LabSize.X, LabSize.Y);
+	
 }
 
 // Called when the game starts or when spawned
@@ -142,8 +144,8 @@ void ALabyrinth::ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRot
 	switch (Direction)
 	{
 	case East:
-		Offset = FVector2D(0 - (bMoveHalfTile ? 0.5 : 0), 0.5);
-		Rotation = FRotator(0, 0, 0);
+		Offset = FVector2D(0 + (bMoveHalfTile ? 0.5 : 0), 0.5);
+		Rotation = FRotator(0, 180, 0);
 		break;
 	case West:
 		Offset = FVector2D(0 - (bMoveHalfTile ? 0.5 : 0), -0.5);
@@ -154,8 +156,8 @@ void ALabyrinth::ComputeWallOffset(EDirection Direction, FVector2D& Offset, FRot
 		Rotation = FRotator(0, 90, 0);
 		break;
 	case South:
-		Offset = FVector2D(-0.5, 0 - (bMoveHalfTile ? 0.5 : 0));
-		Rotation = FRotator(0, 90, 0);
+		Offset = FVector2D(-0.5, 0 + (bMoveHalfTile ? 0.5 : 0));
+		Rotation = FRotator(0, -90, 0);
 		break;
 	default: ;
 	}
@@ -212,8 +214,7 @@ void ALabyrinth::CreateFloor(int x, int y)
 
 	UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
 	Mesh->SetStaticMesh(FloorMeshClass);
-	Mesh->SetWorldLocation(FVector(- 0.5 * TileSize.X, - 0.5 * TileSize.Y, 0));
-	Mesh->SetWorldScale3D(FVector(x, y, 1));
+	Mesh->SetWorldLocation(FVector((-0.5 + static_cast<double>(x)) * TileSize.X, (-0.5+static_cast<double>(y)) * TileSize.Y, 0));
 	Mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	Mesh->RegisterComponent();
 	Mesh->CreationMethod = EComponentCreationMethod::UserConstructionScript;
