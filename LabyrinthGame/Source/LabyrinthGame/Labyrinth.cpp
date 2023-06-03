@@ -105,6 +105,7 @@ void ALabyrinth::OnConstruction(const FTransform& Transform)
 			CreateExit(EntranceCell->x, EntranceCell->y, West, EntranceActorClass);
 			EntranceDirection = West;
 		}
+		EntranceLocation = FVector(EntranceCell->x * TileSize.X, EntranceCell->y * TileSize.Y, 0);
 	}
 
 

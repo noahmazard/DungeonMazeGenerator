@@ -19,6 +19,9 @@ public:
 	// Called when the game starts or when spawned
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	UPROPERTY(BlueprintReadOnly)
+	FVector EntranceLocation;
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = Mesh)

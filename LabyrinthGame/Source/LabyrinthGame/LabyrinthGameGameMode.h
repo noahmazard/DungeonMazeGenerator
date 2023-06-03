@@ -12,9 +12,12 @@ class ALabyrinthGameGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	int nbKeys = 0;
+
+protected:
 	ALabyrinthGameGameMode();
 
-	int nbKeys = 0;
+	virtual void RestartPlayer(AController* NewPlayer) override;
 };
 
 
