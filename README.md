@@ -36,3 +36,18 @@ In the details panel, you'll see the followings options :
 3. Two buttons used to rebuild the dungeon
   - **Clear Labyrinth** : clear all the labyrinth
   - **Generate Labyrith** : generate all the labyrinth and the visual
+
+In Editor, try and play with the settings and hit **Generate Labyrith** to see the result.
+You can then hit Play and test it in game.
+
+## Architecture
+All the code is made in C++.
+The only Blueprint code you'll find is for the UI and visual animation of certains assets (ie. doors and chest)
+
+The maze is first generated in the `MazeGenerator` class. 
+
+Then, the `Labyrinth` class (which `BP_Labyrinth` inherit from) deals with the generation in the engine by spawning all the meshes and actors.
+
+For the interactables (door and chest), We use the `IInteractable` interface with a `Interact()` function called by the `LabyrinthGamePlayerController` when the E keys is pressed.
+
+Finnaly, in the `LabyrinthGameGameMode` we deal with the player spawning and regeneration of the dungeon at the start of the game.
