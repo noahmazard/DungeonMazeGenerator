@@ -24,8 +24,14 @@ void ALabyrinthGameGameMode::RestartPlayer(AController* NewPlayer)
 	
 	FTransform SpawnTransform = FTransform::Identity;
 	
-	if (const ALabyrinth* Labyrinth = Cast<ALabyrinth>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabyrinth::StaticClass())))
+	if (ALabyrinth* Labyrinth = Cast<ALabyrinth>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabyrinth::StaticClass())))
 	{
+		if (Labyrinth->RandomGenerationAtStart)
+		{
+			Labyrinth->SetSeed(FMath::Rand());
+			Labyrinth->GenerateLabyrinth();
+		}
+		
 		if (const UChildActorComponent* Entrance = Labyrinth->EntranceComponent)
 		{
 			const FTransform T = Entrance->GetComponentTransform();

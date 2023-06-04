@@ -116,6 +116,11 @@ void ALabyrinth::GenerateLabyrinth()
 	}
 }
 
+void ALabyrinth::SetSeed(int _seed)
+{
+	Seed = _seed;
+}
+
 void ALabyrinth::ClearLabyrinth()
 {
 	//Destroy all actors

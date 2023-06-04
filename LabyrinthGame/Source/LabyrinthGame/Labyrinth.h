@@ -40,7 +40,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Generation)
 	int nbChests = 1;
-
+	
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	TSubclassOf<AActor> ExitActorClass;
 
@@ -54,11 +54,18 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = Generation)
-	void GenerateLabyrinth();
-
-	UFUNCTION(BlueprintCallable, CallInEditor, Category = Generation)
 	void ClearLabyrinth();
 
+public:
+
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = Generation)
+	void GenerateLabyrinth();
+
+	UFUNCTION()
+	void SetSeed(int _seed);
+	
+	UPROPERTY(EditAnywhere, Category = Generation)
+	bool RandomGenerationAtStart = false;
 	
 private:
 	UPROPERTY()
