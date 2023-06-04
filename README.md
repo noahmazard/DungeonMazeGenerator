@@ -11,6 +11,7 @@ To exit the dungeon, the player needs keys that are given by the chests.
 Exemple of a generated dungeon.
 
 ## How to test it :
+Open the Project with Unreal Engine 5.0
 
 Open the `FirstPerson\Maps\FirstPersonMap` level.
 
