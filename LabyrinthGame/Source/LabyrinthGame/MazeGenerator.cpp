@@ -35,6 +35,7 @@ void MazeGenerator::Generate()
 		int x = pos.first;
 		int y = pos.second;
 
+		//init values for current cell
 		const int ID = y * Width + x;
 		cells[ID].Visited = true;
 		cells[ID].id = ID;
@@ -166,6 +167,7 @@ MazeCell* MazeGenerator::GetRandomOuterCell(int defaultId = 0) const
 	}
 }
 
+//Get the direction of the outer wall cell
 int MazeGenerator::GetDirection(int cellId) const
 {
 	int direction = 0;

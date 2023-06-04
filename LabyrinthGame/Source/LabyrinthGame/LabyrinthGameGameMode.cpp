@@ -6,13 +6,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
-ALabyrinthGameGameMode::ALabyrinthGameGameMode()
-	: Super()
+ALabyrinthGameGameMode::ALabyrinthGameGameMode() : Super()
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
-
 }
 
 void ALabyrinthGameGameMode::RestartPlayer(AController* NewPlayer)
@@ -26,12 +24,14 @@ void ALabyrinthGameGameMode::RestartPlayer(AController* NewPlayer)
 	
 	if (ALabyrinth* Labyrinth = Cast<ALabyrinth>(UGameplayStatics::GetActorOfClass(GetWorld(), ALabyrinth::StaticClass())))
 	{
+		// Generate labyrinth if needed
 		if (Labyrinth->RandomGenerationAtStart)
 		{
 			Labyrinth->SetSeed(FMath::Rand());
 			Labyrinth->GenerateLabyrinth();
 		}
-		
+
+		// Spawn player at entrance
 		if (const UChildActorComponent* Entrance = Labyrinth->EntranceComponent)
 		{
 			const FTransform T = Entrance->GetComponentTransform();
