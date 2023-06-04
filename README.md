@@ -40,7 +40,7 @@ In the details panel, you'll see the followings options :
 In Editor, try and play with the settings and hit **Generate Labyrith** to see the result.
 You can then hit Play and test it in game.
 
-## Architecture
+## Architecture :
 All the code is made in C++.
 The only Blueprint code you'll find is for the UI and visual animation of certains assets (ie. doors and chest)
 
@@ -51,3 +51,19 @@ Then, the `Labyrinth` class (which `BP_Labyrinth` inherit from) deals with the g
 For the interactables (door and chest), We use the `IInteractable` interface with a `Interact()` function called by the `LabyrinthGamePlayerController` when the E keys is pressed.
 
 Finnaly, in the `LabyrinthGameGameMode` we deal with the player spawning and regeneration of the dungeon at the start of the game.
+
+## Time passed on each feature :
+
+- Placings walls and floor in the actor (`Labyrinth`) : 3h
+- Maze Generation (`MazeGenerator`) : 1h
+- Interactables (`IInteractables`, `Chest`, `Door`) : 1h30
+- Entrance and Exit Generation (`MazeGenerator`, `Labyrinth`) : 2h
+- Chest Generation (`MazeGenerator`, `Labyrinth`): 2h
+- Assets Animations (door, chest) : 30min
+- Spawning Player at the entrance (`LabyrinthGameGameMode`) : 1h30
+- Changing to betters assest : 1h
+- Moving Generation out of construction script (adding buttons) (`Labyrinth`) : 3h
+
+Total : ~16 hours passed on that project
+
+
